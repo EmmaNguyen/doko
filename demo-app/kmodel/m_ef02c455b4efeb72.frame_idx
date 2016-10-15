@@ -1,0 +1,13 @@
+[sframe]
+version=0
+num_segments=0
+num_columns=3
+nrows=1000
+[column_names]
+0000=row_id
+0001=cluster_id
+0002=distance
+[column_files]
+0000=m_ef02c455b4efeb72.sidx:0
+0001=m_ef02c455b4efeb72.sidx:1
+0002=m_ef02c455b4efeb72.sidx:2
