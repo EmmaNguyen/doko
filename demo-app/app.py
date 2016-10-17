@@ -14,11 +14,17 @@ from flask import Flask, request, render_template
 from flask_googlemaps import GoogleMaps
 from flask_googlemaps import Map, icons
 
+from model import read_data
 from forms import TravelForm
 
 from model import read_data
 
 from os import path
+
+import pymongo
+from pymongo import MongoClient
+
+from recommender import recommender
   
 
 SECRET_KEY = str(uuid.uuid4())
@@ -50,9 +56,13 @@ def home():
         username=form.username.data
         city=form.city.data
 
-        session['city'] = city
-        session['community'] = "&".join(run_model(username))
-
+	userID, community = run_model(username)
+	
+        db.doko.insert_one({'userID':userID,'city':city,'community': community})
+        #session['city'] = city
+	#session['userID'] = userID
+        #session['community'] = "&".join(community)
+	
         return redirect(url_for('fullmap'))
     return render_template('index.html',form=form)
 
@@ -61,18 +71,33 @@ def fullmap():
     '''
     Return results on Google Map.
     '''
-    city = session['city']
-    community = session['community']
-    community = community.split('&')
+    #city = session.get('city',None)
+    #userID = session.get('userID',None) 
+    c = db.doko.find().limit(1)
 
-    top5 = build_recommender(community,city)
+    for line in c:
+        data = line
 
-    lat1, lng1, info1 = list(top5.iloc[0])
-    lat2, lng2, info2 = list(top5.iloc[1])
-    lat3, lng3, info3 = list(top5.iloc[2])
-    lat4, lng4, info4 = list(top5.iloc[3])
-    lat5, lng5, info5 = list(top5.iloc[4])
+    city = data["city"]
+    userID = data["userID"]
+    community = data["community"]
+    
+    print "----------fullmap---------------"
+    print city
+    print userID
+    print community
 
+    #community = session.get('community', None)
+    #print community
+    #community = community.split('&')
+
+    top5 = build_recommender(userID,community,city)
+
+    lon1, lon2, lon3, lon4, lon5 = top5['longitude']
+    lat1, lat2, lat3, lat4, lat5 = top5['latitude']
+    text1, text2, text3, text4, text5 = top5['text']
+    name1, name2, name3, name4, name5 = top5['name']
+    
     fullmap = Map(
         identifier="fullmap",
         varname="fullmap",
@@ -88,38 +113,38 @@ def fullmap():
         markers=[
             {
                 'icon': '//maps.google.com/mapfiles/ms/icons/green-dot.png',
-                'title': info1, 
+                'title': name1, 
                 'lat': lat1,
                 'lng': lng1,
-                'infobox': "Coool!"
+                'infobox': text1
             },
             {
                 'icon': '//maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                'title': info2, 
+                'title': name2, 
                 'lat': lat2,
                 'lng': lng2,
-                'infobox': "Awesome!"            
+                'infobox': text2            
             },
             {
                 'icon': '//maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-                'title': info3, 
+                'title': name3, 
                 'lat': lat3,
                 'lng': lng3,
-                'infobox': "Hahaha Food is great!"
+                'infobox': text3
             },
             {
                 'icon': '//maps.google.com/mapfiles/ms/icons/orange-dot.png',
-                'title': info4, 
+                'title': name4, 
                 'lat': lat4,
                 'lng': lng4,
-                'infobox': "Special Promotion in this weekend!!!"
+                'infobox': text4
             },
 	    {
                 'icon': '//maps.google.com/mapfiles/ms/icons/green-dot.png',
-                'title': info5, 
+                'title': name5, 
                 'lat': lat5,
                 'lng': lng5,
-                'infobox': "Super special discount for ALLLLL!"
+                'infobox': text5
             }
 
         ],
@@ -131,19 +156,28 @@ def fullmap():
 
 #--------------------End of web app------------------------#
 
+
 def run_model(username,modelName='kmodel'):
     model = gl.load_model(modelName)
     data = read_data()
-    dataset =data[data["name"]==username]
-    community_id = list(set(model.predict(dataset)))[0]
-    return list(data[model.predict(data)==community_id]['user_id'])
 
-def build_recommender():
+    userID = data.filter_by(username,'name')[0]['user_id']
+    userData =  data.filter_by(userID,'user_id')
+    community_id = list(set(model.predict(userData)))[0]
+
+    return userData['user_id'][0], list(data[model.predict(gl.SFrame(data))==community_id]['user_id'])
+
+def build_recommender(userID,community,city):
     r = recommender()
-    return r.build()
+    return r.build(userID,community,city,5)
     
 def main():
     app.run(debug=True)
+
 if __name__ == '__main__': 
+    client = MongoClient()
+    db = client.doko
+    print "Conneted to MongoDB"
+
     main()
 
