@@ -14,7 +14,7 @@ This is a demo app to run a model based on a simple model called Kmeans, which i
 
 **Warning** The demo is still under constructed so there will be some bugs inside. Really sorry if it happens to you. I will try to fix the code soon. 
 
-### How to run demo (Applied to Linux worked in terminal and )
+### How to run demo (Applied to Linux worked in terminal)
 
 First of all, please run this command to download dataset:
 
@@ -26,6 +26,8 @@ Download this git repo by running this command:
 git clone https://github.com/emmanguyen/doko
 
 ```
+
+Create a folder containing data and download datasets
 
 ```cmd
 
