@@ -22,7 +22,6 @@ This web app is still under construction, so there are a few of bugs. So really 
 
 This is a demo app to run a model based on a simple model called Kmeans, which is one of the most common algorithms to deal with high dimension and complex datasets. It is gonna return a model to create a user-by-user similarity matrix, and then use that matrix to build a recommendation system built upon a personal preference that suggest a list of matching locations in a city.
 
-**Warning** The demo is still under constructed so there will be some bugs inside. Really sorry if it happens to you. I will try to fix the code soon. 
 
 ### How to run demo (Applied to Linux worked in terminal)
 
