@@ -6,7 +6,17 @@ Doko - A smart tour guider for world-traveler. Explore and travel without planni
 
 ### Overview
 
-This demo is mainly created by Flask, a light-weighted framework for web development with jinja2. The template of homepage is taken from abc with something I don't remember. You can find the original template here. For submit page, I create by using WTF take the main keleton from one page of Inkquick, an wonderful app of finding the matching tatoo artist, created by Lee Murray, with courtesy. The last page I is created by Flask-GoogleMaps. 
+This demo is mainly created by Flask, a light-weighted framework for web development with jinja2. The template of homepage is rendered by a Bootstrap template called Grayscale created by David Miller. The orginal work can be found at here:
+
+- https://github.com/davidtmiller
+
+The imaged used is taken from Pexel under creative common liscence.
+
+For submit page, I create by using WTF take the main keleton from one page of Inkquick, an wonderful app of finding the matching tatoo artist, created by Lee Murray, with courtesy. The last page I is created by Flask-GoogleMaps. 
+
+## Bugs and fixes
+
+This web app is still under construction, so there are a few of bugs. So really sorry if happends to you. I will try to fix it soon.
 
 ## About demo
 
