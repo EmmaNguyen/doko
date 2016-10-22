@@ -59,8 +59,8 @@ def home():
 	userID, community = run_model(username)
 	
         db.doko.insert_one({'userID':userID,'city':city,'community': community})
-        #session['city'] = city
-	#session['userID'] = userID
+        session['userCity'] = city
+	session['userID'] = userID
         #session['community'] = "&".join(community)
 	
         return redirect(url_for('fullmap'))
@@ -71,19 +71,19 @@ def fullmap():
     '''
     Return results on Google Map.
     '''
-    #city = session.get('city',None)
-    #userID = session.get('userID',None) 
-    c = db.doko.find().limit(1)
+    city_ = session.get('userCity',None)
+    userID = session.get('userID',None) 
+    c = db.doko.find({'userID':userID}).limit(1)
 
     for line in c:
         data = line
 
-    city = data["city"]
+    #cities = data["city"]
     userID = data["userID"]
     community = data["community"]
     
     print "----------fullmap---------------"
-    print city
+    print city_
     print userID
     print community
 
@@ -91,12 +91,15 @@ def fullmap():
     #print community
     #community = community.split('&')
 
-    top5 = build_recommender(userID,community,city)
+    top5 = build_recommender(userID,community,city_)
+    print "---------Top5--------------"
+    print top5
 
-    lon1, lon2, lon3, lon4, lon5 = top5['longitude']
+    lng1, lng2, lng3, lng4, lng5 = top5['longitude']
     lat1, lat2, lat3, lat4, lat5 = top5['latitude']
     text1, text2, text3, text4, text5 = top5['text']
     name1, name2, name3, name4, name5 = top5['name']
+    
     
     fullmap = Map(
         identifier="fullmap",
@@ -109,49 +112,50 @@ def fullmap():
             "position:absolute;"
             "z-index:100;"
         ),
-        
+        lat=lat1,
+        lng=lng1,
         markers=[
             {
-                'icon': '//maps.google.com/mapfiles/ms/icons/green-dot.png',
-                'title': name1, 
+                'icon': '//maps.google.com/mapfiles/ms/icons/purple-dot.png',
                 'lat': lat1,
                 'lng': lng1,
-                'infobox': text1
+                'infobox': "Hello I am <b style='color:green;'>"+name1+"</b>!"
             },
             {
                 'icon': '//maps.google.com/mapfiles/ms/icons/blue-dot.png',
-                'title': name2, 
                 'lat': lat2,
                 'lng': lng2,
-                'infobox': text2            
-            },
-            {
-                'icon': '//maps.google.com/mapfiles/ms/icons/yellow-dot.png',
-                'title': name3, 
-                'lat': lat3,
-                'lng': lng3,
-                'infobox': text3
+                'infobox': "Hello I am <b style='color:blue;'>BLUE</b>!"
             },
             {
                 'icon': '//maps.google.com/mapfiles/ms/icons/orange-dot.png',
-                'title': name4, 
+                'lat': lat3,
+                'lng': lng3,
+                'infobox': "Hello I am <b style='color:blue;'>BLUE</b>!"
+            },
+             {
+                'icon': '//maps.google.com/mapfiles/ms/icons/green-dot.png',
                 'lat': lat4,
                 'lng': lng4,
-                'infobox': text4
+                'infobox': "Hello I am <b style='color:blue;'>BLUE</b>!"
             },
-	    {
-                'icon': '//maps.google.com/mapfiles/ms/icons/green-dot.png',
-                'title': name5, 
+            {
+                'icon': icons.dots.yellow,
+                'title': name5,
                 'lat': lat5,
                 'lng': lng5,
-                'infobox': text5
+                'infobox': (
+                    "Hello I am <b style='color:#ffcc00;'>YELLOW</b>!"
+                    "<h2>It is HTML title</h2>"
+                    "<img src='//placehold.it/50'>"
+                    "<br>Images allowed!"
+                )
             }
-
         ],
          maptype = "TERRAIN",
         # zoom="5"
     )
-    return render_template('fullmap.html')
+    return render_template('fullmap.html', fullmap=fullmap)
 
 
 #--------------------End of web app------------------------#
@@ -180,4 +184,3 @@ if __name__ == '__main__':
     print "Conneted to MongoDB"
 
     main()
-
