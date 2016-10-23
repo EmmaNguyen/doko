@@ -1,0 +1,11 @@
+from app import run_model
+from recommender import recommender
+
+name = "Jeremy"
+userID, community = run_model(name)
+city = "ABC"
+k = 5
+
+recs = recommender()
+recs.build(userID, community, city,k)
+
