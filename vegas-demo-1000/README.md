@@ -105,7 +105,7 @@ cd demo-app
 To build a model, run this command:
 
 ```
-cd python model.py
+python model.py
 
 ```
 
